@@ -13,6 +13,20 @@
  const request = axios.create({
    baseURL: REVIEWS_API_URL
  });
+
+ function parseQuery(query) {
+  const filmQuery = Object.assign({}, query);  
+
+  if (filmQuery.offset) {
+    filmQuery.offset = parseInt(filmQuery.offset, 10);
+  }
+
+  if (filmQuery.limit) {
+    filmQuery.limit = parseInt(filmQuery.limit, 10);
+  }
+
+  return filmQuery;
+}
  
  function getReviewsForFilms(filmIds) {
    if (typeof filmIds !== 'number' && typeof filmIds !== 'string' && !Array.isArray(filmIds)) {
@@ -29,14 +43,30 @@
 
  router.get('/:id/recommendations', getFilmRecommendations);
  
- function getFilmRecommendations(req, res) {
-   const filmId = req.params.id;
-     const meta = Object.assign({
-     offset: 1,
-     limit: 10
-   }, req.query);
- 
-   models.Film.findById(filmId)
+
+  function getFilmRecommendations(req, res, err) {
+   const filmId = parseInt(req.params.id, 10);
+   const meta = Object.assign({
+    offset: 1,
+    limit: 10
+    }, parseQuery(req.query));
+
+    if (isNaN(filmId)) {
+      res.status(422).json({ message: `Id ${req.params.id} is not a number.` });
+      return err();
+    }
+
+    if (isNaN(meta.limit)) {
+      res.status(422).json({ message: `Limit ${req.query.limit} is not a number.` });
+      return err();
+    }
+   
+    if (isNaN(meta.offset)) {
+      res.status(422).json({ message: `Offset ${req.query.offset} is not a number.` });
+      return err();
+    }
+
+    models.Film.findById(filmId)
      .then(film => {
        if (film) {
          return models.Film.findAll({
