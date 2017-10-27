@@ -4,12 +4,12 @@ const sqlite = require('sqlite'),
       express = require('express'),
       app = express();
 
-const { PORT=3000, NODE_ENV='development', DB_PATH='./db/database.db' } = process.env;
+ const films = require('./routes/films');
+ const models = require('./models');
 
-const sequelize = new Sequelize({
-   dialect: 'sqlite',
-   storage: DB_PATH
-});
+ const { PORT=3000, NODE_ENV='development', DB_PATH='./db/database.db' } = process.env;
+
+app.use('/films', films);
 
 // START SERVER
 Promise.resolve()
