@@ -13,5 +13,7 @@ const path = require('path');
  models.Genre = sequelize.import(path.join(__dirname, 'genre'));
  models.Film = sequelize.import(path.join(__dirname, 'film'));
   
+ models.Film.belongsTo(models.Genre, { foreignKey: 'genre_id' });
+
  models.sequelize = sequelize;
  module.exports = models;
